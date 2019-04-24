@@ -4,29 +4,18 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
 void Test1()
 {
     BPNeuralNetwork network(3, {3, 3}, 1);
-    vector<MatrixXd> X;
-    VectorXd X1(3);
-    X1 << 0, 0, 1;
-    VectorXd X2(3);
-    X2 << 0, 1, 1;
-    VectorXd X3(3);
-    X3 << 1, 0, 1;
-    VectorXd X4(3);
-    X4 << 1, 1, 1;
-    X.push_back(X1);
-    X.push_back(X2);
-    X.push_back(X3);
-    X.push_back(X4);
-    vector<double> Y = {0, 1, 1, 0};
+    vector<vector<double>> X = {{0, 0, 1}, {0, 1, 1}, {1, 0, 1}, {1, 1, 1}};
+    vector<double> Y		 = {0, 1, 1, 0};
     for (int i = 0; i < 10000; i++)
     {
         for (size_t j = 0; j < X.size(); j++)
         {
-            network.input = X.at(j);
+            network.SetInput(X.at(j));
             VectorXd targets = VectorXd(1, 1);
             targets << Y.at(j);
             network.FeedForward();
@@ -37,9 +26,9 @@ void Test1()
             cout << "output: " << endl;
             for (size_t k = 0; k < Y.size(); k++)
             {
-                network.input = X.at(k);
+                network.SetInput(X.at(k));
                 network.FeedForward();
-                cout << network.output << endl;
+                cout << network.GetOutput() << endl;
             }
         }
     }
@@ -64,8 +53,8 @@ void Test2()
     {
         for (size_t j = 0; j < x1.size(); j++)
         {
-            network.input(0) = x1.at(j);
-            network.input(1) = x2.at(j);
+            vector<double> input = {x1.at(j), x2.at(j)};
+            network.SetInput(input);
             targets(0) = y.at(j);
             network.FeedForward();
             network.Backpropagation(targets);
@@ -75,36 +64,36 @@ void Test2()
     cout << "output: " << endl;
     for (size_t k = 0; k < y.size(); k++)
     {
-        network.input(0) = x1.at(k);
-        network.input(1) = x2.at(k);
+        vector<double> input = {x1.at(k), x2.at(k)};
+        network.SetInput(input);
         network.FeedForward();
-        cout << network.output << ", ";
+        cout << network.GetOutput() << ", ";
     }
     cout << endl;
 }
 
-void Test3()
-{
-    BPNeuralNetwork network(2, {2}, 2);
-    network.input << 0.05, 0.1;
-    network.weights.at(0) << 0.15, 0.20, 0.25, 0.30;
-    network.weights.at(1) << 0.40, 0.45, 0.50, 0.55;
-    network.biases.at(0) << 0.35, 0.35;
-    network.biases.at(1) << 0.60, 0.60;
-    VectorXd targets(2);
-    targets << 0.01, 0.99;
-    network.FeedForward();
-    network.Backpropagation(targets);
-    cout << "output: " << endl << network.output << endl;
-    cout << "weights 0:" << endl << network.weights.at(0) << endl;
-    cout << "weights 1:" << endl << network.weights.at(1) << endl;
-}
+// void Test3()
+//{
+//    BPNeuralNetwork network(2, {2}, 2);
+//    network.SetInput({0.05, 0.1});
+//    network.weights.at(0) << 0.15, 0.20, 0.25, 0.30;
+//    network.weights.at(1) << 0.40, 0.45, 0.50, 0.55;
+//    network.biases.at(0) << 0.35, 0.35;
+//    network.biases.at(1) << 0.60, 0.60;
+//    VectorXd targets(2);
+//    targets << 0.01, 0.99;
+//    network.FeedForward();
+//    network.Backpropagation(targets);
+//    cout << "output: " << endl << network.output << endl;
+//    cout << "weights 0:" << endl << network.weights.at(0) << endl;
+//    cout << "weights 1:" << endl << network.weights.at(1) << endl;
+//}
 
-void TimeIt()
-{
-    clock_t begin = clock();
-    Test1();
-    clock_t end = clock();
-    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-    cout << "elapsed seconds: " << elapsed_secs << endl;
-}
+// void TimeIt()
+//{
+//    clock_t begin = clock();
+//    Test1();
+//    clock_t end			= clock();
+//    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+//    cout << "elapsed seconds: " << elapsed_secs << endl;
+//}

@@ -9,3 +9,5 @@ SOURCES += main.cpp \
 
 HEADERS += BPNeuralNetwork.hpp \
     Test.hpp
+
+INCLUDEPATH += D:\\eigen3

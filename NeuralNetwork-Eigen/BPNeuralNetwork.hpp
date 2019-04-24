@@ -2,44 +2,44 @@
 #define BPNEURALNETWORK_HPP
 #include <eigen3/Eigen/Dense>
 #include <vector>
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
-using std::vector;
 
 class BPNeuralNetwork
 {
-public:
+  private:
+    typedef Eigen::MatrixXd MatrixXd;
+    typedef Eigen::VectorXd VectorXd;
+
     VectorXd input;
-    vector<VectorXd> hidden;
+    std::vector<VectorXd> hidden;
     VectorXd output;
 
-    vector<MatrixXd> weights;
-    vector<VectorXd> biases;
-    vector<VectorXd> deltas;
+    std::vector<MatrixXd> weights;
+    std::vector<VectorXd> biases;
+    std::vector<VectorXd> deltas;
 
     double learningRate = 0.5;
 
-    BPNeuralNetwork(int numOfInput, vector<int> numOfHidden, int numOfOutput);
+  public:
+    BPNeuralNetwork(int numOfInput, std::vector<int> numOfHidden,
+                    int numOfOutput);
+    void SetInput(const std::vector<double>& input);
+    const VectorXd& GetOutput() const;
+    double Mse(const std::vector<double>& targets) const;
     void FeedForward();
     void Backpropagation(const VectorXd& targets);
 
-private:
+  private:
     void BackpropagationToOutputLayer(const VectorXd& targets);
     void BackpropagationToHiddenLayers();
     void UpdateWeights();
     void UpdateLastWeights();
     void UpdateMiddleWeights();
     void UpdateFirstWeights();
-    void RandomizeMatrix(MatrixXd& matrix);
-    void RandomizeVector(VectorXd& vec);
+    static void RandomizeMatrix(MatrixXd& matrix);
+    static void RandomizeVector(VectorXd& vec);
 
-    static VectorXd& First(vector<VectorXd>& vec);
-    static MatrixXd& First(vector<MatrixXd>& vec);
-    static VectorXd& Last(vector<VectorXd>& vec);
-    static MatrixXd& Last(vector<MatrixXd>& vec);
-    static int& Last(vector<int>& vec);
+    static void Activte(Eigen::VectorXd& result, const Eigen::VectorXd& input);
+    static Eigen::VectorXd DerivativeActive(const Eigen::VectorXd& input);
 };
 
-void Activte(Eigen::VectorXd& result, const Eigen::VectorXd& input);
-Eigen::VectorXd DerivativeActive(const Eigen::VectorXd& input);
 #endif // BPNEURALNETWORK_HPP

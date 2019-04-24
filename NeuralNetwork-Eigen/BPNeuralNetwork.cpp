@@ -7,12 +7,9 @@ using namespace std;
 
 BPNeuralNetwork::BPNeuralNetwork(int numOfInput, vector<int> numOfHidden,
                                  int numOfOutput)
-    : input(numOfInput)
-    , hidden(numOfHidden.size())
-    , output(numOfOutput)
-    , weights(numOfHidden.size() + 1)
-    , biases(numOfHidden.size() + 1)
-    , deltas(numOfHidden.size() + 1)
+    : input(numOfInput), hidden(numOfHidden.size()), output(numOfOutput),
+      weights(numOfHidden.size() + 1), biases(numOfHidden.size() + 1),
+      deltas(numOfHidden.size() + 1)
 {
     if (numOfHidden.size() < 1)
     {
@@ -20,18 +17,18 @@ BPNeuralNetwork::BPNeuralNetwork(int numOfInput, vector<int> numOfHidden,
     }
     else
     {
-        weights.at(0) = MatrixXd(numOfHidden.at(0), numOfInput);
-        biases.at(0) = VectorXd(numOfHidden.at(0));
-        deltas.at(0) = VectorXd(numOfHidden.at(0));
+        weights.front() = MatrixXd(numOfHidden.front(), numOfInput);
+        biases.front()  = VectorXd(numOfHidden.front());
+        deltas.front()  = VectorXd(numOfHidden.front());
 
         for (size_t i = 1; i < numOfHidden.size(); i++)
         {
             weights.at(i) = MatrixXd(numOfHidden.at(i), numOfHidden.at(i - 1));
-            biases.at(i) = VectorXd(numOfHidden.at(i));
-            deltas.at(i) = VectorXd(numOfHidden.at(i));
+            biases.at(i)  = VectorXd(numOfHidden.at(i));
+            deltas.at(i)  = VectorXd(numOfHidden.at(i));
         }
         weights.at(numOfHidden.size()) =
-            MatrixXd(numOfOutput, Last(numOfHidden));
+            MatrixXd(numOfOutput, numOfHidden.back());
         biases.at(numOfHidden.size()) = VectorXd(numOfOutput);
         deltas.at(numOfHidden.size()) = VectorXd(numOfOutput);
 
@@ -50,14 +47,54 @@ BPNeuralNetwork::BPNeuralNetwork(int numOfInput, vector<int> numOfHidden,
     }
 }
 
+void BPNeuralNetwork::SetInput(const vector<double>& input)
+{
+    if (input.size() == this->input.rows())
+    {
+        int n = input.size();
+        for (int i = 0; i < n; i++)
+        {
+            this->input(i) = input[i];
+        }
+    }
+    else
+    {
+        throw string("input size does not match");
+    }
+}
+
+const Eigen::VectorXd& BPNeuralNetwork::GetOutput() const
+{
+    return output;
+}
+
+double BPNeuralNetwork::Mse(const std::vector<double>& targets) const
+{
+    if (targets.size() == this->output.rows())
+    {
+        int n	  = targets.size();
+        double sum = 0.0;
+        for (int i = 0; i < n; i++)
+        {
+            double t = (targets[i] - output(i));
+            sum		 = sum + t * t;
+        }
+        return sum / n;
+    }
+    else
+    {
+        throw string("targets size does not match");
+    }
+}
+
 void BPNeuralNetwork::FeedForward()
 {
-    Activte(First(hidden), First(weights) * input + First(biases));
+    Activte(hidden.front(), weights.front() * input + biases.front());
     for (size_t i = 1; i < hidden.size(); i++)
     {
         Activte(hidden.at(i), weights.at(i) * hidden.at(i - 1) + biases.at(i));
     }
-    Activte(output, Last(weights) * Last(hidden) + Last(biases));
+    Activte(output, weights.back() * hidden.back() + biases.back());
 }
 
 void BPNeuralNetwork::Backpropagation(const Eigen::VectorXd& targets)
@@ -79,7 +116,7 @@ void BPNeuralNetwork::BackpropagationToOutputLayer(
     MatrixXd derivative = DerivativeActive(output);
     for (long i = 0; i < derivative.size(); i++)
     {
-        Last(deltas)(i) = derivative(i) * errorFactor(i);
+        deltas.back()(i) = derivative(i) * errorFactor(i);
     }
 }
 
@@ -107,14 +144,14 @@ void BPNeuralNetwork::UpdateWeights()
 
 void BPNeuralNetwork::UpdateLastWeights()
 {
-    Last(biases) = Last(biases) - learningRate * Last(deltas);
-    MatrixXd& weight = Last(weights);
+    biases.back()	= biases.back() - learningRate * deltas.back();
+    MatrixXd& weight = weights.back();
     for (int i = 0; i < weight.rows(); i++)
     {
         for (int j = 0; j < weight.cols(); j++)
         {
-            weight(i, j) =
-                weight(i, j) - learningRate * Last(hidden)(j) * Last(deltas)(i);
+            weight(i, j) = weight(i, j) -
+                           learningRate * hidden.back()(j) * deltas.back()(i);
         }
     }
 }
@@ -141,14 +178,14 @@ void BPNeuralNetwork::UpdateMiddleWeights()
 
 void BPNeuralNetwork::UpdateFirstWeights()
 {
-    First(biases) = First(biases) - learningRate * First(deltas);
-    MatrixXd& weight = First(weights);
+    biases.front()   = biases.front() - learningRate * deltas.front();
+    MatrixXd& weight = weights.front();
     for (int i = 0; i < weight.rows(); i++)
     {
         for (int j = 0; j < weight.cols(); j++)
         {
             weight(i, j) =
-                weight(i, j) - learningRate * input(j) * First(deltas)(i);
+                weight(i, j) - learningRate * input(j) * deltas.front()(i);
         }
     }
 }
@@ -175,32 +212,7 @@ void BPNeuralNetwork::RandomizeVector(Eigen::VectorXd& vec)
     }
 }
 
-Eigen::VectorXd& BPNeuralNetwork::First(vector<Eigen::VectorXd>& vec)
-{
-    return vec.at(0);
-}
-
-Eigen::MatrixXd& BPNeuralNetwork::First(vector<Eigen::MatrixXd>& vec)
-{
-    return vec.at(0);
-}
-
-Eigen::VectorXd& BPNeuralNetwork::Last(vector<Eigen::VectorXd>& vec)
-{
-    return vec.at(vec.size() - 1);
-}
-
-Eigen::MatrixXd& BPNeuralNetwork::Last(vector<Eigen::MatrixXd>& vec)
-{
-    return vec.at(vec.size() - 1);
-}
-
-int& BPNeuralNetwork::Last(vector<int>& vec)
-{
-    return vec.at(vec.size() - 1);
-}
-
-void Activte(VectorXd& result, const VectorXd& input)
+void BPNeuralNetwork::Activte(VectorXd& result, const VectorXd& input)
 {
     for (int i = 0; i < input.size(); i++)
     {
@@ -208,7 +220,7 @@ void Activte(VectorXd& result, const VectorXd& input)
     }
 }
 
-VectorXd DerivativeActive(const VectorXd& input)
+Eigen::VectorXd BPNeuralNetwork::DerivativeActive(const VectorXd& input)
 {
     VectorXd result(input.size());
     for (long i = 0; i < input.size(); i++)
