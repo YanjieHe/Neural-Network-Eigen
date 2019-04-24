@@ -222,6 +222,7 @@ Makefile: ..\NeuralNetwork-Eigen\NeuralNetwork-Eigen.pro D:\Documents\Qt\5.12.1\
 		D:\Documents\Qt\5.12.1\msvc2017\mkspecs\features\qt_config.prf \
 		D:\Documents\Qt\5.12.1\msvc2017\mkspecs\win32-msvc\qmake.conf \
 		D:\Documents\Qt\5.12.1\msvc2017\mkspecs\features\spec_post.prf \
+		.qmake.stash \
 		D:\Documents\Qt\5.12.1\msvc2017\mkspecs\features\exclusive_builds.prf \
 		D:\Documents\Qt\5.12.1\msvc2017\mkspecs\common\msvc-version.conf \
 		D:\Documents\Qt\5.12.1\msvc2017\mkspecs\features\toolchain.prf \
@@ -387,6 +388,7 @@ D:\Documents\Qt\5.12.1\msvc2017\mkspecs\features\qt_functions.prf:
 D:\Documents\Qt\5.12.1\msvc2017\mkspecs\features\qt_config.prf:
 D:\Documents\Qt\5.12.1\msvc2017\mkspecs\win32-msvc\qmake.conf:
 D:\Documents\Qt\5.12.1\msvc2017\mkspecs\features\spec_post.prf:
+.qmake.stash:
 D:\Documents\Qt\5.12.1\msvc2017\mkspecs\features\exclusive_builds.prf:
 D:\Documents\Qt\5.12.1\msvc2017\mkspecs\common\msvc-version.conf:
 D:\Documents\Qt\5.12.1\msvc2017\mkspecs\features\toolchain.prf:

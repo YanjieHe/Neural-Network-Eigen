@@ -25,6 +25,7 @@ class BPNeuralNetwork
     void SetInput(const std::vector<double>& input);
     const VectorXd& GetOutput() const;
     double Mse(const std::vector<double>& targets) const;
+    void SetLearningRate(double learningRate);
     void FeedForward();
     void Backpropagation(const VectorXd& targets);
 

@@ -87,6 +87,11 @@ double BPNeuralNetwork::Mse(const std::vector<double>& targets) const
     }
 }
 
+void BPNeuralNetwork::SetLearningRate(double learningRate)
+{
+    this->learningRate = learningRate;
+}
+
 void BPNeuralNetwork::FeedForward()
 {
     Activte(hidden.front(), weights.front() * input + biases.front());
